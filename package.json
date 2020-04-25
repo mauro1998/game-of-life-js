@@ -1,0 +1,29 @@
+{
+  "name": "game-of-life",
+  "version": "1.0.0",
+  "description": "Conway's Game of Life written in js",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx http-server ./ -p 8080",
+    "build": "babel src --watch --out-dir dist ./src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mauro1998/game-of-life-js.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mauro1998/game-of-life-js/issues"
+  },
+  "homepage": "https://github.com/mauro1998/game-of-life-js#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.5",
+    "http-server": "^0.12.1"
+  },
+  "dependencies": {
+    "phaser": "^3.22.0"
+  }
+}
