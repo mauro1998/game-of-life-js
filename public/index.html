@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Conway's Game of Life</title>
+
+    <link rel="stylesheet" href="assets/styles.css" />
+    <link rel="stylesheet" href="assets/line-awesome.min.css" />
+
+    <!-- update the version number as needed -->
+    <!-- <script defer src="/__/firebase/7.14.2/firebase-app.js"></script> -->
+    <!-- include only the Firebase features as you need -->
+    <!-- <script defer src="/__/firebase/7.14.2/firebase-auth.js"></script>
+    <script defer src="/__/firebase/7.14.2/firebase-database.js"></script>
+    <script defer src="/__/firebase/7.14.2/firebase-messaging.js"></script>
+    <script defer src="/__/firebase/7.14.2/firebase-storage.js"></script> -->
+    <!-- initialize the SDK after all desired features are loaded -->
+    <!-- <script defer src="/__/firebase/init.js"></script> -->
+  </head>
+  <body>
+    <div class="controls">
+      <button disabled id="PLAY">
+        <i class="las la-play"></i>
+      </button>
+      <button disabled id="PAUSE">
+        <i class="las la-pause"></i>
+      </button>
+      <button disabled id="SPEED_DOWN">
+        <i class="las la-fast-backward"></i>
+      </button>
+      <button disabled id="SPEED_UP">
+        <i class="las la-fast-forward"></i>
+      </button>
+      <button disabled id="STOP">
+        <i class="las la-stop"></i>
+      </button>
+      <button disabled id="UNDO">
+        <i class="las la-undo-alt"></i>
+      </button>
+      <button disabled id="REDO">
+        <i class="las la-redo-alt"></i>
+      </button>
+      <button disabled id="SAVE">
+        <i class="las la-save"></i>
+      </button>
+    </div>
+
+    <div class="top-right-container">
+      SPEED: <span id="speed">...</span>DRAWING MODE:
+      <span id="drawing-mode">...</span>
+    </div>
+
+    <script src="scripts/phaser.min.js"></script>
+    <script src="scripts/ui.js"></script>
+    <script src="scripts/main.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        var controls = new GameControls();
+        var gameConfig = setupGameScene({
+          options: {
+            cellSize: 20,
+            canvasSize: {
+              width: window.innerWidth,
+              height: window.innerHeight,
+            },
+            controls: controls,
+          },
+        });
+
+        var game = new Phaser.Game(gameConfig);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,26 @@
+[debug] [2020-04-26T20:55:28.020Z] ----------------------------------------------------------------------
+[debug] [2020-04-26T20:55:28.022Z] Command:       /Users/maguilar/.nvm/versions/node/v10.20.1/bin/node /Users/maguilar/.nvm/versions/node/v10.20.1/bin/firebase serve --only hosting
+[debug] [2020-04-26T20:55:28.022Z] CLI Version:   8.1.1
+[debug] [2020-04-26T20:55:28.023Z] Platform:      darwin
+[debug] [2020-04-26T20:55:28.023Z] Node Version:  v10.20.1
+[debug] [2020-04-26T20:55:28.032Z] Time:          Sun Apr 26 2020 15:55:28 GMT-0500 (Colombia Standard Time)
+[debug] [2020-04-26T20:55:28.032Z] ----------------------------------------------------------------------
+[debug] [2020-04-26T20:55:28.032Z] 
+[debug] [2020-04-26T20:55:28.057Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2020-04-26T20:55:28.058Z] > authorizing via signed-in user
+[debug] [2020-04-26T20:55:28.058Z] [iam] checking project conways-life-game-7b582 for permissions ["firebase.projects.get"]
+[debug] [2020-04-26T20:55:28.068Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2020-04-26T20:55:28.069Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ <request body omitted>
+[debug] [2020-04-26T20:55:28.568Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=utf-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Sun, 26 Apr 2020 20:55:28 GMT","server":"scaffolding on HTTPServer2","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"quic=\":443\"; ma=2592000; v=\"46,43\",h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000","accept-ranges":"none","transfer-encoding":"chunked"}
+[debug] [2020-04-26T20:55:28.589Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/conways-life-game-7b582:testIamPermissions  
+ {"permissions":["firebase.projects.get"]}
+[debug] [2020-04-26T20:55:29.351Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Sun, 26 Apr 2020 20:55:29 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","server-timing":"gfet4t7; dur=467","alt-svc":"quic=\":443\"; ma=2592000; v=\"46,43\",h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000","accept-ranges":"none","transfer-encoding":"chunked"}
+[debug] [2020-04-26T20:55:29.353Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/conways-life-game-7b582  
+ 
+[debug] [2020-04-26T20:55:30.696Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Sun, 26 Apr 2020 20:55:30 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"quic=\":443\"; ma=2592000; v=\"46,43\",h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000","accept-ranges":"none","transfer-encoding":"chunked"}
+[debug] [2020-04-26T20:55:30.703Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/conways-life-game-7b582/webApps/-/config  
+ 
+[debug] [2020-04-26T20:55:31.334Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Sun, 26 Apr 2020 20:55:31 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"quic=\":443\"; ma=2592000; v=\"46,43\",h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000","accept-ranges":"none","transfer-encoding":"chunked"}
+[info] i  hosting: Serving hosting files from: public
+[info] ✔  hosting: Local server: http://localhost:5000
