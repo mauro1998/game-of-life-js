@@ -172,6 +172,9 @@
           wh = window.innerHeight;
         }
 
+        if (wd > 1360) wd = 1360;
+        if (wh > 620) wh = 620;
+
         if (!Util.isDivisibleByCellSize(wd)) {
           wd = Util.getNearestDivisibleByCellSize(wd);
         }
@@ -271,6 +274,9 @@
       Util.setCellSize(CELL_SIZE);
 
       const CANVAS_SIZE = Util.getCanvasPreferredSize(canvasSize);
+
+      console.log(CANVAS_SIZE);
+
       const NUM_CELLS_X = Math.floor(CANVAS_SIZE.width / CELL_SIZE);
       const NUM_CELLS_Y = Math.floor(CANVAS_SIZE.height / CELL_SIZE);
 
@@ -424,7 +430,7 @@
                   state[similar],
                 ];
               } else {
-                state.push(incoming);
+                state.push({ id: incoming.id, pattern: incoming.pattern });
               }
             } else {
               const pattern = this._getCurrentPatternFromBoard();
@@ -432,7 +438,7 @@
 
               if (exists) return;
 
-              state.push(pattern);
+              state.push({ id: pattern.id, pattern: pattern.pattern });
             }
 
             if (state.length > 15) {
@@ -786,6 +792,14 @@
         type: Phaser.AUTO,
         width: CANVAS_SIZE.width,
         height: CANVAS_SIZE.height,
+        scale: {
+          mode: Phaser.Scale.FIT,
+          parent: "phaser-example",
+          resolution: 1,
+          width: CANVAS_SIZE.width,
+          height: CANVAS_SIZE.height,
+        },
+        backgroundColor: "#000000",
         scene: [MainGameScene],
       };
     };
