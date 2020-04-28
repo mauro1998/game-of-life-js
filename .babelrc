@@ -1,3 +1,13 @@
 {
-  "presets": ["@babel/preset-env"]
+  "compact": true,
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "useBuiltIns": "entry",
+        "corejs": 3,
+        "modules": "umd"
+      }
+    ]
+  ]
 }

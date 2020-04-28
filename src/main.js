@@ -1,8 +1,164 @@
 (() => {
   window.setupGameScene = (() => {
+    class Pattern {
+      constructor(id, pattern) {
+        this.id = id;
+        this.pattern = Array.isArray(pattern)
+          ? pattern
+          : typeof pattern === "string"
+          ? Pattern.parse(pattern)
+          : null;
+        this._serialized = this.serialize({ partially: true });
+      }
+
+      get length() {
+        return this.pattern.length;
+      }
+
+      adjustToCurrentGrid(length) {
+        if (!this.isValid || length === this.length) return;
+
+        if (length > this.length) {
+          const diff = length - this.length;
+          for (let i = 0; i < diff; i++) this.pattern.push(0);
+        } else {
+          this.pattern = this.pattern.slice(0, length);
+        }
+      }
+
+      isSimilarTo(pattern) {
+        return pattern._serialized === this._serialized;
+      }
+
+      static fromSerialized(str) {
+        const obj = new Pattern();
+
+        try {
+          const { id, pattern } = JSON.parse(str);
+          obj.id = id;
+          obj.pattern = pattern;
+        } catch (err) {
+          console.error("Error parsing pattern", err);
+        }
+
+        return obj;
+      }
+
+      static parse(strpattern) {
+        try {
+          return JSON.parse(strpattern);
+        } catch (err) {
+          console.error("Error parsing pattern", err);
+          return null;
+        }
+      }
+
+      get isValid() {
+        return !!(
+          this.id &&
+          typeof this.id === "string" &&
+          Array.isArray(this.pattern)
+        );
+      }
+
+      serialize(options) {
+        if (!this.isValid) return "";
+
+        const { partially = false } = options || {};
+        let obj;
+
+        if (partially) {
+          obj = this.pattern;
+        } else {
+          obj = {
+            id: this.id,
+            pattern: this.pattern,
+          };
+        }
+
+        return JSON.stringify(obj);
+      }
+    }
+
+    class RemoteStorage {
+      static get _collectionName() {
+        return "patterns";
+      }
+
+      static get _instance() {
+        return firebase.firestore();
+      }
+
+      static get _collection() {
+        return this._instance.collection(this._collectionName);
+      }
+
+      static _createLink(id) {
+        return (
+          window.location.protocol +
+          "//" +
+          window.location.hostname +
+          (window.location.port ? ":" + window.location.port : "") +
+          "?id=" +
+          id.trim()
+        );
+      }
+
+      static generateLink(obj) {
+        try {
+          return this._collection
+            .add({ pattern: obj.serialize({ partially: true }) })
+            .then((doc) => RemoteStorage._createLink(doc.id))
+            .catch((error) => {
+              console.error("Error generating link", error);
+              return null;
+            });
+        } catch (error) {
+          console.error("Error generating link", error);
+          return null;
+        }
+      }
+
+      static loadPatternFromQueryParam() {
+        const querystr = window.location.search;
+        const params = new URLSearchParams(querystr);
+
+        if (params.has("id")) {
+          const id = params.get("id").trim();
+
+          if (id) {
+            return this._collection
+              .doc(id)
+              .get()
+              .then((doc) => {
+                if (doc.exists) {
+                  const data = doc.data();
+                  const pattern = new Pattern(doc.id, data.pattern);
+                  return pattern.isValid ? pattern : null;
+                }
+
+                return null;
+              })
+              .catch((err) => {
+                console.error("Error fetching pattern", err);
+                return null;
+              });
+          }
+        }
+
+        return null;
+      }
+    }
+
     class Util {
       static setCellSize(size) {
         Util._cellSize = size;
+      }
+
+      static getUniqueId() {
+        return (
+          Math.random().toString(36).substring(2) + Date.now().toString(36)
+        );
       }
 
       static getCanvasPreferredSize(size) {
@@ -245,25 +401,44 @@
           );
         },
 
-        getGamePattern() {
-          return this.cells.map((cell) => +cell.__alive);
+        _getCurrentPatternFromBoard() {
+          const pattern = this.cells.map((cell) => +cell.__alive);
+          return new Pattern(Util.getUniqueId(), pattern);
         },
 
-        saveToLocalStorage() {
+        _saveToLocalStorage(incoming) {
           try {
-            let state = [];
+            let state = this._getStateFromLocalStorage();
 
-            if (localStorage.length) {
-              state = JSON.parse(localStorage.getItem("state"));
+            if (incoming && incoming.isValid) {
+              incoming.adjustToCurrentGrid(this.cells.length);
+
+              const similar = state.findIndex(
+                (p) => p.id === incoming.id || p.isSimilarTo(incoming)
+              );
+
+              if (similar > -1) {
+                state = [
+                  ...state.slice(0, similar),
+                  ...state.slice(similar + 1),
+                  state[similar],
+                ];
+              } else {
+                state.push(incoming);
+              }
+            } else {
+              const pattern = this._getCurrentPatternFromBoard();
+              const exists = state.some((p) => p.isSimilarTo(pattern));
+
+              if (exists) return;
+
+              state.push(pattern);
             }
 
-            const pattern = this.getGamePattern();
-            const serialized = JSON.stringify(pattern);
-            const exists = state.some((p) => JSON.stringify(p) === serialized);
+            if (state.length > 15) {
+              state = state.slice(state.length - 15);
+            }
 
-            if (exists) return;
-
-            state.push(pattern);
             this._currentPatternIndex = state.length - 1;
             localStorage.setItem("state", JSON.stringify(state));
           } catch (e) {
@@ -274,7 +449,12 @@
         _getStateFromLocalStorage() {
           try {
             if (localStorage.length) {
-              return JSON.parse(localStorage.getItem("state"));
+              const state = (
+                JSON.parse(localStorage.getItem("state")) || []
+              ).filter((obj) => !!obj);
+              return state
+                .map((p) => new Pattern(p.id, p.pattern))
+                .filter((p) => p.isValid);
             } else {
               return [];
             }
@@ -352,8 +532,8 @@
           this._currentPatternIndex = this._currentPatternIndex + 1;
         },
 
-        drawPattern(pattern) {
-          if (!this.cells || !pattern) return;
+        drawPattern(obj) {
+          if (!this.cells || !obj || !obj.isValid) return;
 
           const draw = (sequence) => {
             this.cells.forEach((cell, i) => {
@@ -363,18 +543,34 @@
             });
           };
 
-          if (this.cells.length >= pattern.length) {
-            draw(pattern);
-          } else {
-            draw(pattern.slice(0, this.cells.length));
-          }
+          draw(obj.pattern);
 
           this._checkCellsState();
         },
 
+        _copyToClipboard(str) {
+          const el = document.createElement("textarea");
+          el.value = str;
+          document.body.appendChild(el);
+          el.select();
+          document.execCommand("copy");
+          document.body.removeChild(el);
+        },
+
         save() {
           if (this.paused && this._boardHasCellsAlive) {
-            const state = this.getGamePattern();
+            const pattern = this._getCurrentPatternFromBoard();
+            RemoteStorage.generateLink(pattern).then((link) => {
+              if (!link)
+                return alert(
+                  "An unexpected error occured generating a link, please try again later."
+                );
+
+              this._copyToClipboard(link);
+              alert(
+                `Link copied to clipboard!\n${link}\nUse it to share your pixel art with your friends!`
+              );
+            });
           }
         },
 
@@ -410,7 +606,7 @@
         play() {
           if (this._boardHasCellsAlive) {
             if (this._firstRun) {
-              this.saveToLocalStorage();
+              this._saveToLocalStorage();
               this._firstRun = false;
             }
 
@@ -500,7 +696,12 @@
             controls.disable(controls.actions.SAVE);
             controls.disable(controls.actions.STOP);
           } else if (!this._boardHasCellsAlive && !this.paused) {
-            setTimeout(() => this.pause(), 500);
+            setTimeout(() => {
+              this.stop();
+              controls.disable(controls.actions.PLAY);
+              controls.disable(controls.actions.SAVE);
+              controls.disable(controls.actions.STOP);
+            }, 500);
           }
         },
 
@@ -539,12 +740,36 @@
           this._checkCellsState();
         },
 
+        _start() {
+          const request = RemoteStorage.loadPatternFromQueryParam();
+
+          if (request) {
+            request
+              .then((pattern) => {
+                if (pattern && pattern.isValid) {
+                  this._saveToLocalStorage(pattern);
+                  this._currentPatternIndex = null;
+                  this._checkLocalHistoryAndControls({
+                    drawInitialIndex: true,
+                  });
+                }
+
+                this.pause();
+              })
+              .catch((err) => {
+                console.error(err);
+                this.pause();
+              });
+          } else {
+            this.pause();
+          }
+        },
+
         create() {
           this.generateGrid();
           this.setupGridInteraction();
           this.setupControls();
-          this.pause();
-          this._checkCellsState();
+          this._start();
         },
 
         update(time) {
